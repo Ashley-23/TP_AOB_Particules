@@ -111,10 +111,11 @@
 
 # OPTIMISATION DU CODE 
 
-## Fonctions de base
-
 ### OPTIMISATION 1 : changement de add_vectors(), scale_vector(), sub_vectors() et mod()
 On retourne directement un vecteur au lieu de créé un vecteur temporaire sur lequel faire les opérations 
+
+        * Objectif : éliminé les variables temporaires et permettre au compilateur d'optimiser les retours au moyen des registres du processeur.
+
 
 Les fonctions deviennent :
 
@@ -142,18 +143,27 @@ mod (vector a)
   return sqrt((a.x*a.x) + (a.y*a.y));
 }
 
+
 ### OPTIMISATION 2 : modification de la fonction compute_accelerations()
 
 on a remplacer x/y par (1/y)*x et pow(x,3) 
 
-#### OPTIMISATION 3 : inversion de boucle 
+        * Objectif : Réduire le coût des opérations arithmétiques, car la multiplication est généralement plus rapide que la division.
+
+### OPTIMISATION 3 : inversion de boucle 
 
 inversion des boucles i et j au niveau de resolve_collisions ( on parcoure j avant i )
+
+        * Objectif : Améliorer la localité spatiale des accès mémoire en optimisant l'ordre de parcours des données.
 
 ### OPTIMISATION 4 : changement de sqrt en sqrtf 
 Dans la fonction mod(), nous avons changé l'appel de sqrt à l'appel de sqrtf
 
+        * Objectif : Utiliser l'opération en simple précision (32 bits) au lieu de double précision (64 bits) pour accélérer le calcul de la racine carrée en exploitant des instructions processeur plus rapides.
+
 ### OPtimisation 5 : modification de compute_accelerations
+
+        * Objectif : Améliorer l'accès mémoire en séparant la phase d'initialisation de la phase de calcul.
 
 Au lieu de mettre acceleration[i].x et acceleration[i].y à 0 à chaque fois qu'on rentre dans la boucle, on fait une boucle qui les mets à 0 avant de commencer la modification. 
 
@@ -184,27 +194,37 @@ compute_accelerations (i32 nbodies, vector *accelerations, f64 *masses,
 
 on retourne directement la valeur au lieu de créé une variable intermédiaire.
 
+        * Objectif : Éliminer les variables intermédiaires inutiles pour réduire les opérations de copie et l'utilisation de la pile.
+
 ### OPTIMISATION 7 : O2
 compilation du code avec l'option O2
+
+        * Objectif : activer les optimisations standards du compilateur sans augmenter le temps de compilation
 
 ### OPTIMISATION 8 : O3
 compilation du code avec l'option O3
 
+        * Objectif : c'est une optimisation standard du compilateur qui : déroule de boucles, élimine de code mort et optimise des expressions. 
+
 ### OPTIMISATION 9 : Ofast
 compilation du code avec l'option Ofast
+
+        * Objectif : permettre des optimisations mathématiques non conformes aux standards IEEE pour gagner en vitesse au détriment de la précision
+
 
 ### OPTIMISATION 10 : -O3 -march=native
 compilation du code avec l'option Ofast
 
-### OPTIMISATION 11 : -O3 -march=native
+        * Objectif : exploiter les instructions spécifiques du processeur (SIMD, AVX, ...) pour maximiser les performances.
+
+### OPTIMISATION 11 : static inline
 On a mis toutes les fonctions de bases ( add_vectors(), scale_vector(), sub_vectors() et mod() ) dans l'en-tête kernel.h précédé des commandes "static inline" 
 
-        * Objectif : Normalement, quand le code appelle une fonction f(x), le processeur doit faire un saut vers une autre partie de la mémoire, copier les arguments, exécuter le code puis revenir. Le fait de mettre inline suggère au compilateur de ne pa faire ce saut mais de copier-coller directement le contenu de la fonction là où elle a été appellée. 
+        * Objectif : Normalement, quand le code appelle une fonction f(x), le processeur doit faire un saut vers une autre partie de la mémoire, copier les arguments, exécuter le code puis revenir. Le fait de mettre inline suggère au compilateur de ne pas faire ce saut mais de copier-coller directement le contenu de la fonction là où elle a été appellée. 
 
 
 
 # PERFORMANCES 
-
 
 ## Code de base 
 
@@ -259,10 +279,10 @@ On est à 125 fps
 Pour nbodies =1000 et time_stemp = 300
 On est à 126 fps
 
-## Après l'optimisation 10
+## Après l'optimisation 11 
 
 Pour nbodies =1000 et time_stemp = 300
-On est à 126 fps
+On est à 30 fps
 
 
 
