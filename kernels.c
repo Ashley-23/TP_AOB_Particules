@@ -15,70 +15,7 @@ unimplemented ()
   puts ("unimplemented functions called");
 }
  
-/*
-  Add vector a with vector b
-  input :
-    - vector
-    - vector
-  output : vector
-*/
-vector
-add_vectors (vector a, vector b)
-{
-  vector r;
-  r.x = a.x + b.x;
-  r.y = a.y + b.y;
-  return r;
-}
 
-/*
-  Multiply vector a with b value
-  input :
-    - f64
-    - vector
-  output : vector
-*/
-vector
-scale_vector (f64 b, vector a)
-{
-  vector r;
-  r.x = a.x * b;
-  r.y = a.y * b;
-  return r;
-}
-
-/*
-  Substitute vector b from the vector a
-  input :
-    - vector
-    - vector
-  output : vector
-  */
-vector
-sub_vectors (vector a, vector b)
-{
-  vector r;
-  r.x = a.x - b.x;
-  r.y = a.y - b.y;
-  return r;
-}
-
-/*
-  Eclidian distance of vector
-  input :
-    - vector
-  output : f64
-*/
-f64
-mod (vector a)
-{
-  vector r;
-  f64 modulo;
-  r.x = a.x * a.x;
-  r.y = a.y * a.y;
-  modulo = sqrt(r.x + r.y);
-  return modulo;
-}
 
 /*
   Initialize the system by setting random values
@@ -138,11 +75,10 @@ compute_accelerations (i32 nbodies, vector *accelerations, f64 *masses,
       if (i==j) continue;
       vector diff = sub_vectors(positions[j], positions[i]);
       vector diff2 = sub_vectors(positions[i], positions[j]);
-      f64  d = pow(mod(diff2), 3) + 1e7;
-      f64 f = GRAVITY * masses[i] * (1/d); //////////////////////////// { on a remplacer x/y par (1/y)*x }
+      f64  d = ( mod(diff2)*mod(diff2)*mod(diff2) ) + 1e7;
+      f64 f = GRAVITY * masses[i] * (1/d); 
       vector a_ij = scale_vector(f, diff);
       accelerations[i] = add_vectors(accelerations[i], a_ij);
-      
     }         
   }
 }
@@ -154,10 +90,8 @@ void
 compute_velocities (i32 nbodies, vector *velocities, vector *accelerations)
 {
   int i = 0;
-  vector vel;
   for(i=0; i< nbodies; i++){
-    vel = add_vectors(velocities[i], accelerations[i]);
-    velocities[i] = vel;
+    velocities[i] = add_vectors(velocities[i], accelerations[i]);
   }
 }
 
@@ -230,3 +164,4 @@ free_memory (i32 nbodies, f64 *masses, vector *positions, vector *velocities,
   free (accelerations);
   free (masses);
 }
+

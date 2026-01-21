@@ -1,0 +1,19 @@
+
+
+
+
+/* Le "f64 f = GRAVITY * masses[i] / d;" a été remplacé par "f64 f = GRAVITY * masses[i] * (1/d);"*/ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+

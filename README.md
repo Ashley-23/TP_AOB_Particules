@@ -111,29 +111,158 @@
 
 # OPTIMISATION DU CODE 
 
+## Fonctions de base
+
+### OPTIMISATION 1 : changement de add_vectors(), scale_vector(), sub_vectors() et mod()
+On retourne directement un vecteur au lieu de créé un vecteur temporaire sur lequel faire les opérations 
+
+Les fonctions deviennent :
+
+vector
+add_vectors (vector a, vector b)
+{
+  return (vector){a.x+b.x, a.y+b.y};
+}
+
+vector
+scale_vector (f64 b, vector a)
+{
+  return (vector){a.x*b,  a.y*b};
+}
+
+vector
+sub_vectors (vector a, vector b)
+{
+  return (vector){a.x-b.x, a.y-b.y};
+}
+
+f64
+mod (vector a)
+{ 
+  return sqrt((a.x*a.x) + (a.y*a.y));
+}
+
+### OPTIMISATION 2 : modification de la fonction compute_accelerations()
+
+on a remplacer x/y par (1/y)*x et pow(x,3) 
+
+#### OPTIMISATION 3 : inversion de boucle 
+
+inversion des boucles i et j au niveau de resolve_collisions ( on parcoure j avant i )
+
+### OPTIMISATION 4 : changement de sqrt en sqrtf 
+Dans la fonction mod(), nous avons changé l'appel de sqrt à l'appel de sqrtf
+
+### OPtimisation 5 : modification de compute_accelerations
+
+Au lieu de mettre acceleration[i].x et acceleration[i].y à 0 à chaque fois qu'on rentre dans la boucle, on fait une boucle qui les mets à 0 avant de commencer la modification. 
+
+void
+compute_accelerations (i32 nbodies, vector *accelerations, f64 *masses,
+                       vector *positions)
+{
+  for (int i = 0; i < nbodies; i++) {
+    accelerations[i].x = 0;
+    accelerations[i].y = 0;
+  }
+  
+    for (int i = 0; i < nbodies; i++) {
+      for ( int j = 0; j< nbodies; j++) {
+        if (i==j) continue;
+        vector diff = sub_vectors(positions[j], positions[i]);
+        vector diff2 = sub_vectors(positions[i], positions[j]);
+        f64  d = ( mod(diff2)*mod(diff2)*mod(diff2) ) + 1e7;
+        f64 f = GRAVITY * masses[i] * (1/d); 
+        vector a_ij = scale_vector(f, diff);
+        accelerations[i] = add_vectors(accelerations[i], a_ij);
+      }         
+    }
+}
+
+
+### OPTIMISATION 6 : modification de compute_velocities
+
+on retourne directement la valeur au lieu de créé une variable intermédiaire.
+
+### OPTIMISATION 7 : O2
+compilation du code avec l'option O2
+
+### OPTIMISATION 8 : O3
+compilation du code avec l'option O3
+
+### OPTIMISATION 9 : Ofast
+compilation du code avec l'option Ofast
+
+### OPTIMISATION 10 : -O3 -march=native
+compilation du code avec l'option Ofast
+
+### OPTIMISATION 11 : -O3 -march=native
+On a mis toutes les fonctions de bases ( add_vectors(), scale_vector(), sub_vectors() et mod() ) dans l'en-tête kernel.h précédé des commandes "static inline" 
+
+        * Objectif : Normalement, quand le code appelle une fonction f(x), le processeur doit faire un saut vers une autre partie de la mémoire, copier les arguments, exécuter le code puis revenir. Le fait de mettre inline suggère au compilateur de ne pa faire ce saut mais de copier-coller directement le contenu de la fonction là où elle a été appellée. 
 
 
 
 # PERFORMANCES 
 
 
+## Code de base 
+
+Pour nbodies =1000 et time_stemp = 300
+On est à 20 fps
+
+## Après OPTIMISATION 1 
+
+Pour nbodies =1000 et time_stemp = 300
+On est à 21 fps à peu près. Le nombre de frames par secondes augmente légèrement 
+
+## Après OPTIMISATION 2
+
+Pour nbodies =1000 et time_stemp = 300
+On est à 30 fps
+
+## Après OPTIMISATION 3 
+
+Le nombre de frames par seconde n'a pas augmenté donc nous gardons la place des boucles. 
+
+## Après l'optimisation 4
+
+Le nombre de fps a diminué
+
+## Après l'optimisation 5 
+
+Pas de changement notable 
+
+## Après l'optimisation 6 
+
+Pour nbodies =1000 et time_stemp = 300
+On est à 33 fps
+
+## Après l'optimisation 7
+
+Pour nbodies =1000 et time_stemp = 300
+On est à 202 fps
+
+## Après l'optimisation 8
+
+Pour nbodies =1000 et time_stemp = 300
+On est à 120 fps
 
 
+## Après l'optimisation 9
 
+Pour nbodies =1000 et time_stemp = 300
+On est à 125 fps
 
+## Après l'optimisation 10
 
+Pour nbodies =1000 et time_stemp = 300
+On est à 126 fps
 
+## Après l'optimisation 10
 
-
-
-
-
-
-
-
-
-
-
+Pour nbodies =1000 et time_stemp = 300
+On est à 126 fps
 
 
 

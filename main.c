@@ -62,8 +62,8 @@ main (i32 argc, char **argv)
   //i32 nbodies = 500;
   ///i32 time_stemp = 3000;
 
-  i32 nbodies = 500;
-  i32 time_stemp = 3000;
+  i32 nbodies = 1000;
+  i32 time_stemp = 300;
 
   f64 *masses;
   vector *positions;
